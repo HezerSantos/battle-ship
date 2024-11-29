@@ -1,4 +1,4 @@
-export const createShip = (length, isVertical = true) => {
+const createShip = (length, isVertical = true) => {
     const shipLength = length;
     let numberOfHits = 0;
     let isShipSunk = false;
@@ -26,10 +26,10 @@ export const createShip = (length, isVertical = true) => {
         isVertical
     }
 }
-
-export const createGameBoard = () => {
+const createGameBoard = () => {
     let gameBoard = new Map();
-    let missedAttacks = []
+    let hitAttacks = new Set();
+    let missedAttacks = new Set();
     let shipCount = 1;
 
     const placeShip = (startX, startY, length, status) => {
@@ -49,23 +49,24 @@ export const createGameBoard = () => {
         if (gameBoard.size === 0){
             return
         }
+        const attack = [x, y]
         gameBoard.forEach((value, key) => {
             if (value[2]){
                 if (value[0]['startX'] === x && (value[0]['startY'] <= y && y <= value[0]['endY'])){
                     value[1].hit();
-                } else {
-                    const attack = [x, y]
-                    missedAttacks.push(attack)
+                    hitAttacks.add(attack)
                 }
-            } else {
+            } else if (!value[2]){
                 if ((value[0]['startX'] <= x && x <= value[0]['endX']) && value[0]['startY'] === y){
                     value[1].hit();
-                } else {
-                    const attack = [x, y]
-                    missedAttacks.push(attack)
+                    hitAttacks.add(attack)
                 }
             }
         })
+
+        if (!hitAttacks.has(attack)){
+            missedAttacks.add(attack)
+        }
     }
 
 
@@ -73,8 +74,53 @@ export const createGameBoard = () => {
     return {
         gameBoard,
         placeShip, 
-        recieveAttack
+        recieveAttack,
+        hitAttacks,
+        missedAttacks
     }
 }
+
+//the for loop runs in order so who which ever ship is placed first should be the one that recieves?
+
+const test = createGameBoard()
+
+test.placeShip(4,8,4, true) //vertical
+test.placeShip(5,8,4, false) //horizontal
+
+
+test.recieveAttack(4, 8) //vertical
+test.recieveAttack(5, 8) //horizontal
+test.recieveAttack(5, 12) //horizontal
+
+
+test.recieveAttack(6, 8)
+test.recieveAttack(4, 9)
+
+test.recieveAttack(5, 9)
+
+
+
+
+
+
+
+
+
+
+const hitAttacks = test.hitAttacks
+const missedAttack = test.missedAttacks
+let numberOfHits = test.gameBoard.get('Ship1')
+console.log(numberOfHits[1]['numberOfHits'])
+
+numberOfHits = test.gameBoard.get('Ship2')
+console.log(numberOfHits[1]['numberOfHits'])
+
+console.log(hitAttacks)
+console.log(missedAttack)
+
+
+
+
+
 
 
