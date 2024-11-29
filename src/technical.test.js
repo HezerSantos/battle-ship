@@ -1,4 +1,4 @@
-import {createShip} from './technical'
+import {createShip, createGameBoard} from './technical'
 
 
 describe('Ship factory Function', () => {
@@ -25,5 +25,49 @@ describe('Ship factory Function', () => {
         newShip.hit()
         expect(newShip.numberOfHits).toBe(5)
         expect(newShip.isShipSunk).toBe(true)
+    })
+})
+
+describe('Gameboard Factory Function', () => {
+    it('Should create ships with the corresponding coordinates and ship hash', () => {
+        const test = createGameBoard()
+
+        test.placeShip(5,8,4)
+        test.placeShip(5,8,4)
+        test.placeShip(5,8,4)
+
+        const values = Array.from(test.gameBoard.values());
+
+        expect(values.length).toBe(3);
+        
+        expect(values[0][0]['startX']).toEqual(5);
+        expect(values[0][0]['startY']).toEqual(8);
+        expect(values[0][0]['endX']).toEqual(5);
+        expect(values[0][0]['endY']).toEqual(11);
+
+        expect(values[0][1].shipLength).toBe(4);
+
+    });
+
+    it('Updates the ships hit count and logs a missed hit', () => {
+        const test = createGameBoard()
+
+        test.placeShip(5,8,4, false)
+        test.recieveAttack(5, 8)
+        test.recieveAttack(6, 8)
+        test.recieveAttack(7, 8)
+        test.recieveAttack(8, 8)
+        let numberOfHits = test.gameBoard.get('Ship1')
+        expect(numberOfHits[1]['numberOfHits']).toBe(4)
+        expect(numberOfHits[1]['isShipSunk']).toBe(true)
+
+        test.placeShip(5,8,4, true)
+        test.recieveAttack(5, 8)
+        test.recieveAttack(5, 9)
+        test.recieveAttack(5, 10)
+        test.recieveAttack(5, 11)
+        numberOfHits = test.gameBoard.get('Ship2')
+        expect(numberOfHits[1]['numberOfHits']).toBe(4)
+        expect(numberOfHits[1]['isShipSunk']).toBe(true)
     })
 })
