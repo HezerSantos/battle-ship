@@ -67,6 +67,7 @@ describe('Gameboard Factory Function', () => {
         test.recieveAttack(5, 10)
         test.recieveAttack(5, 11)
         test.recieveAttack(5, 12)
+        test.recieveAttack(5, 13)
         numberOfHits = test.gameBoard.get('Ship2')
         expect(numberOfHits[1]['numberOfHits']).toBe(4)
         expect(numberOfHits[1]['isShipSunk']).toBe(true)
@@ -74,6 +75,7 @@ describe('Gameboard Factory Function', () => {
         const missedAttack = test.missedAttacks
 
 
-        expect(missedAttack).toBe([5, 12])
+        expect(missedAttack).toEqual(new Set([[5, 12], [5, 13]]));
+
     })
 })

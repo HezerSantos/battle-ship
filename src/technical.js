@@ -1,13 +1,16 @@
-const createShip = (length, isVertical = true) => {
+export const createShip = (length, isVertical = true) => {
+    //Ship attributes
     const shipLength = length;
     let numberOfHits = 0;
     let isShipSunk = false;
     
+    //Ship hit method to track number of hits on said ship
     const hit = () => {
         numberOfHits ++;
         isSunk();
     }
 
+    //Checks to see if its sunk
     const isSunk = () => {
         if (numberOfHits === shipLength){
             isShipSunk = true;
@@ -26,12 +29,13 @@ const createShip = (length, isVertical = true) => {
         isVertical
     }
 }
-const createGameBoard = () => {
+export const createGameBoard = () => {
     let gameBoard = new Map();
     let hitAttacks = new Set();
     let missedAttacks = new Set();
     let shipCount = 1;
 
+    //Places ship at the coordinates and states the status as isVertical
     const placeShip = (startX, startY, length, status) => {
         const newShip = createShip(length, status);
         const shipHash = `Ship${shipCount}`;
@@ -45,6 +49,7 @@ const createGameBoard = () => {
         }
     }
 
+    //Recieves an attack and calculates the health
     const recieveAttack = (x, y) => {
         if (gameBoard.size === 0){
             return
@@ -64,6 +69,7 @@ const createGameBoard = () => {
             }
         })
 
+        //Adds the missed attacks to track
         if (!hitAttacks.has(attack)){
             missedAttacks.add(attack)
         }
@@ -77,6 +83,27 @@ const createGameBoard = () => {
         recieveAttack,
         hitAttacks,
         missedAttacks
+    }
+}
+
+
+
+export const createRealPlayer = (name) => {
+    const gameBoard = createGameBoard()
+
+    return {
+        name,
+        gameBoard
+    }
+}
+
+export const createComputerPlayer = () => {
+    const name = 'Computer';
+    const gameBoard = createGameBoard()
+
+    return {
+        name,
+        gameBoard
     }
 }
 
