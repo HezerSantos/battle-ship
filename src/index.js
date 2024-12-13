@@ -1,4 +1,5 @@
 import './style.css'
+import { createSelector, activateSelector, createGameBoard } from './form';
 
 if (module.hot) {
     module.hot.accept();
@@ -12,20 +13,8 @@ if (document.querySelector(".mainButton")){
 
     mainButton.addEventListener('click', () => {
         mainContainer.textContent = '';
+        createSelector();
+        activateSelector();
+        createGameBoard(document.querySelector(".opponentSelector").checked);
     })
 }
-
-
-const opponentSelector = document.querySelector(".opponentSelector");
-const circle = document.querySelector(".circle");
-
-opponentSelector.addEventListener('input', () => {
-
-    circle.classList.toggle('circleRight');
-    circle.classList.toggle('circleLeft');
-})
-
-/*
-<h1>BATTLE SHIP</h1>
-<button class="mainButton">Play Game</button>
-*/

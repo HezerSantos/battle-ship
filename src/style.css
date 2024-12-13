@@ -16,7 +16,7 @@ main{
     color: white;
 }
 
-.mainButton{
+.mainButton, .playButton{
     position: relative;
     width: 10rem;
     height: 5rem;
@@ -50,20 +50,10 @@ main{
 .opponentSelector{
     position: relative;
     cursor: pointer;
-    height: 5rem;
-}
-
-.opponentSelector::after{
-    position: absolute;
-    content: '';
-    top: 0;
-    bottom: 0;
-    right: 50%;
-    left: 50%;
-    background-color: white;
-    transform: translateX(-50%);
-    width: 10rem;
-    border-radius: 3rem;
+    width: inherit;
+    height: inherit;
+    opacity: 0;
+    z-index: 3;
 }
 
 .circle{
@@ -80,8 +70,40 @@ main{
 }
 
 .circleLeft{
-    left: 50%;
+    left: 60%;
+
 }
 .circleRight{
-    right: 50%;
+    left: 10%;
+}
+
+.buttonContainer{
+    position: relative;
+    width: 10rem;
+    height: 5rem;
+    border-radius: 5rem;
+    background-color: white;
+}
+
+.buttonContainer::after{
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 4rem;
+    width: 9rem;
+    background-color: rgb(206, 206, 206);
+    border-radius: 3rem; 
+}
+
+.selectorContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 3rem;
+}
+
+.bold{
+    color: black;
 }
