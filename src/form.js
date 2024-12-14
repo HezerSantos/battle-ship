@@ -1,3 +1,5 @@
+import { createDocumentBoard, startRealPlayerGame } from "./game";
+
 export const changeButtonView = () => {
     const circle = document.querySelector(".circle");
     circle.classList.toggle('circleRight');
@@ -54,18 +56,20 @@ export const createSelector = () => {
     main.appendChild(selectorContainer);
 }
 
-export const createGameBoard = (selector) => {
+export const createGameBoard = () => {
     const playButton = document.querySelector(".playButton");
     const main = document.querySelector("main");
     const opponentSelector = document.querySelector(".opponentSelector");
 
     playButton.addEventListener('click', () => {
         main.textContent = '';
+        main.classList.add("gameClass");
         if (opponentSelector.checked){
             console.log('Playing Against Computer')
         }
         if (!opponentSelector.checked){
-            console.log('Playing Against Human')
+            console.log('Playing Against Human');
+            startRealPlayerGame();
         }
     })
 }

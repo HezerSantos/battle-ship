@@ -40,6 +40,7 @@ export const createGameBoard = () => {
         const newShip = createShip(length, status);
         const shipHash = `Ship${shipCount}`;
         shipCount ++;
+        //vertical ships grow from bottom.
         if (newShip.isVertical){
             const shipCoordinates = {'startX': startX, 'startY': startY, 'endX': startX, 'endY': startY + (length - 1)}
             gameBoard.set(shipHash, [shipCoordinates, newShip, newShip.isVertical])
@@ -55,16 +56,20 @@ export const createGameBoard = () => {
             return
         }
         const attack = [x, y]
+        let flag = false;
+
         gameBoard.forEach((value, key) => {
             if (value[2]){
                 if (value[0]['startX'] === x && (value[0]['startY'] <= y && y <= value[0]['endY'])){
                     value[1].hit();
                     hitAttacks.add(attack)
+                    flag = true;
                 }
             } else if (!value[2]){
                 if ((value[0]['startX'] <= x && x <= value[0]['endX']) && value[0]['startY'] === y){
                     value[1].hit();
                     hitAttacks.add(attack)
+                    flag = true;
                 }
             }
         })
@@ -73,6 +78,8 @@ export const createGameBoard = () => {
         if (!hitAttacks.has(attack)){
             missedAttacks.add(attack)
         }
+
+        return flag;
     }
 
 
@@ -108,42 +115,6 @@ export const createComputerPlayer = () => {
 }
 
 //the for loop runs in order so who which ever ship is placed first should be the one that recieves?
-
-const test = createGameBoard()
-
-test.placeShip(4,8,4, true) //vertical
-test.placeShip(5,8,4, false) //horizontal
-
-
-test.recieveAttack(4, 8) //vertical
-test.recieveAttack(5, 8) //horizontal
-test.recieveAttack(5, 12) //horizontal
-
-
-test.recieveAttack(6, 8)
-test.recieveAttack(4, 9)
-
-test.recieveAttack(5, 9)
-
-
-
-
-
-
-
-
-
-
-const hitAttacks = test.hitAttacks
-const missedAttack = test.missedAttacks
-let numberOfHits = test.gameBoard.get('Ship1')
-console.log(numberOfHits[1]['numberOfHits'])
-
-numberOfHits = test.gameBoard.get('Ship2')
-console.log(numberOfHits[1]['numberOfHits'])
-
-console.log(hitAttacks)
-console.log(missedAttack)
 
 
 

@@ -15,6 +15,6 @@ if (document.querySelector(".mainButton")){
         mainContainer.textContent = '';
         createSelector();
         activateSelector();
-        createGameBoard(document.querySelector(".opponentSelector").checked);
+        createGameBoard();
     })
 }

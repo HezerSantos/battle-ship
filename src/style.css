@@ -107,3 +107,32 @@ main{
 .bold{
     color: black;
 }
+
+.gameBoard{
+    border: 2px solid black;
+    display: grid;
+    grid: repeat(10, 4rem) / repeat(10, 4rem);
+    gap: .15rem;
+    background-color: black;
+}
+
+.gameBoard > *{
+    background-color: white;
+    border: none;
+}
+
+.gameClass{
+    flex-direction: row;
+}
+
+.shipColor{
+    background-color: rgb(180, 180, 180); 
+}
+
+.hit{
+    background-color: red;
+}
+
+.miss{
+    background-color: blue;
+}
