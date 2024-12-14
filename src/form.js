@@ -56,7 +56,7 @@ export const createSelector = () => {
     main.appendChild(selectorContainer);
 }
 
-export const createGameBoard = () => {
+export const createGameBoard = (playerOne, playerTwo) => {
     const playButton = document.querySelector(".playButton");
     const main = document.querySelector("main");
     const opponentSelector = document.querySelector(".opponentSelector");
@@ -69,7 +69,7 @@ export const createGameBoard = () => {
         }
         if (!opponentSelector.checked){
             console.log('Playing Against Human');
-            startRealPlayerGame();
+            startRealPlayerGame(playerOne, playerTwo);
         }
     })
 }

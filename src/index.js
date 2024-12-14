@@ -15,6 +15,6 @@ if (document.querySelector(".mainButton")){
         mainContainer.textContent = '';
         createSelector();
         activateSelector();
-        createGameBoard();
+        createGameBoard("player one", "player two");
     })
 }

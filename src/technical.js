@@ -33,12 +33,13 @@ export const createGameBoard = () => {
     let gameBoard = new Map();
     let hitAttacks = new Set();
     let missedAttacks = new Set();
-    let shipCount = 1;
+    let shipCount = 0;
+    let sunkCount = 0;
 
     //Places ship at the coordinates and states the status as isVertical
     const placeShip = (startX, startY, length, status) => {
         const newShip = createShip(length, status);
-        const shipHash = `Ship${shipCount}`;
+        const shipHash = `Ship${shipCount + 1}`;
         shipCount ++;
         //vertical ships grow from bottom.
         if (newShip.isVertical){
@@ -76,13 +77,24 @@ export const createGameBoard = () => {
                                 value[2]
                             ]
                             flagMap.set("sunkFlag", sunkEntries);
+                            sunkCount++;
                         }
                     }
                 } else if (!value[2]){
                     if ((value[0]['startX'] <= x && x <= value[0]['endX']) && value[0]['startY'] === y){
                         value[1].hit();
                         hitAttacks.add(attack)
-                        hitFlag = true;
+                        flagMap.set("hitFlag", true);
+                        if (value[1].isShipSunk){
+                            const sunkEntries = [
+                                true,
+                                [value[0]['startX'], value[0]['startY']],
+                                value[3],
+                                value[2]
+                            ]
+                            flagMap.set("sunkFlag", sunkEntries);
+                            sunkCount++;
+                        }
                     }
                 }
             }
@@ -96,14 +108,18 @@ export const createGameBoard = () => {
         return flagMap;
     }
 
-
-
     return {
         gameBoard,
         placeShip, 
         recieveAttack,
         hitAttacks,
-        missedAttacks
+        missedAttacks,
+        get shipCount(){
+            return shipCount;
+        },
+        get sunkCount(){
+            return sunkCount;
+        }
     }
 }
 

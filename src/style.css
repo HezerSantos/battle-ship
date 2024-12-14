@@ -131,9 +131,40 @@ main{
 
 .hit{
     background-color: red;
-    pointer-events: none;
 }
 
 .miss{
     background-color: blue;
+}
+
+.sunkColor{
+    background-color: #3E2723;
+}
+
+.hit, .miss, .sunkColor, .disableGameBoard{
+    pointer-events: none;
+}
+
+.loseContainer{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10rem;
+    width: 100%;
+    height: 100vh;
+    color: white;
+    z-index: 1;
+}
+
+.loseContainer::after{
+    z-index: -1;
+    position: absolute;
+    content: '';
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: black;
+    opacity: 50%;
 }
