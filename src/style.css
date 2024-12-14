@@ -131,6 +131,7 @@ main{
 
 .hit{
     background-color: red;
+    pointer-events: none;
 }
 
 .miss{

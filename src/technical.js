@@ -43,11 +43,12 @@ export const createGameBoard = () => {
         //vertical ships grow from bottom.
         if (newShip.isVertical){
             const shipCoordinates = {'startX': startX, 'startY': startY, 'endX': startX, 'endY': startY + (length - 1)}
-            gameBoard.set(shipHash, [shipCoordinates, newShip, newShip.isVertical])
+            gameBoard.set(shipHash, [shipCoordinates, newShip, newShip.isVertical, length])
         } else {
             const shipCoordinates = {'startX': startX, 'startY': startY, 'endX': startX + (length - 1), 'endY': startY}
-            gameBoard.set(shipHash, [shipCoordinates, newShip, newShip.isVertical])
+            gameBoard.set(shipHash, [shipCoordinates, newShip, newShip.isVertical, length])
         }
+        return newShip
     }
 
     //Recieves an attack and calculates the health
@@ -56,20 +57,33 @@ export const createGameBoard = () => {
             return
         }
         const attack = [x, y]
-        let flag = false;
+        const flagMap = new Map()
+        flagMap.set("hitFlag", false)
+        flagMap.set("sunkFlag", [false, null, null, null]);
 
         gameBoard.forEach((value, key) => {
-            if (value[2]){
-                if (value[0]['startX'] === x && (value[0]['startY'] <= y && y <= value[0]['endY'])){
-                    value[1].hit();
-                    hitAttacks.add(attack)
-                    flag = true;
-                }
-            } else if (!value[2]){
-                if ((value[0]['startX'] <= x && x <= value[0]['endX']) && value[0]['startY'] === y){
-                    value[1].hit();
-                    hitAttacks.add(attack)
-                    flag = true;
+            if (!hitAttacks.has(attack)){
+                if (value[2]){
+                    if (value[0]['startX'] === x && (value[0]['startY'] <= y && y <= value[0]['endY'])){
+                        value[1].hit();
+                        hitAttacks.add(attack)
+                        flagMap.set("hitFlag", true);
+                        if (value[1].isShipSunk){
+                            const sunkEntries = [
+                                true,
+                                [value[0]['startX'], value[0]['startY']],
+                                value[3],
+                                value[2]
+                            ]
+                            flagMap.set("sunkFlag", sunkEntries);
+                        }
+                    }
+                } else if (!value[2]){
+                    if ((value[0]['startX'] <= x && x <= value[0]['endX']) && value[0]['startY'] === y){
+                        value[1].hit();
+                        hitAttacks.add(attack)
+                        hitFlag = true;
+                    }
                 }
             }
         })
@@ -79,7 +93,7 @@ export const createGameBoard = () => {
             missedAttacks.add(attack)
         }
 
-        return flag;
+        return flagMap;
     }
 
 
