@@ -5,7 +5,7 @@ export const createDocumentBoard = (player, coordinates, pType) => {
 
     const documentBoard = createGridTile(gameBoard, player, pType);
 
-    placeShipOnDocument(player, coordinates);
+    placeShipOnDocument(player, coordinates, pType);
 
     return documentBoard;
 }
@@ -28,6 +28,13 @@ const createEntryBoard = () => {
 
 //Creates the grid tile by creating JS container and reversing each entry
 const createGridTile = (gameBoard, player, pType) => {
+    const gameBoardContainer = document.createElement("div");
+    const playerName = document.createElement("h1")
+    playerName.textContent = player.name
+    playerName.classList.add(pType);
+    gameBoardContainer.classList.add("gameBoardContainer");
+
+    gameBoardContainer.appendChild(playerName)
     const documentBoard = document.createElement("div");
     documentBoard.classList.add("gameBoard");
     const main = document.querySelector("main")
@@ -37,7 +44,8 @@ const createGridTile = (gameBoard, player, pType) => {
             gridTileEventListener(player, entry, documentBoard, pType);
         })
     })
-    main.appendChild(documentBoard);
+    gameBoardContainer.appendChild(documentBoard)
+    main.appendChild(gameBoardContainer);
 
     return documentBoard;
 }
@@ -56,15 +64,18 @@ const gridTileEventListener = (player, entry, documentBoard, pType) => {
     documentBoard.appendChild(gridTile);
 }
 
+let playerFlag = false;
 
 //Checks if a ship has been hit
 const checkHit = (flag, gridTile) => {
     if (flag){
         console.log("hit")
         gridTile.classList.add("hit")
+        playerFlag = true;
     } else {
         console.log("miss")
         gridTile.classList.add("miss")
+        playerFlag = false;
     }
 }
 
@@ -117,7 +128,7 @@ const mapShip = (sx, sy, length, isVertical) => {
     }
 }
 
-const placeShipOnDocument = (player, coordinates) => {
+const placeShipOnDocument = (player, coordinates, pType) => {
     const ships = coordinates;
 
     ships.forEach(ship => {
@@ -130,29 +141,44 @@ const placeShipOnDocument = (player, coordinates) => {
 
         player.gameBoard.placeShip(startX, startY, length, isVertical);
 
-        /*
+        
         const map = mapShip(startX, startY, length, isVertical);
 
         map.forEach(entry => {
-            const tile = document.querySelector(`#g${entry}`);
-            tile.classList.add("shipColor");
+            try{
+                const tile = document.querySelector(`#${pType}${entry}`);
+                tile.classList.add("shipColor");
+            } catch {
+                console.log("Index Out Of Range")
+            }
+
         })
-        */
+        
+        
     })
 }
 
 export const startRealPlayerGame = (nameOne, nameTwo) => {
-    const boardOne = createDocumentBoard(createRealPlayer(nameOne), [[1, 1, 3, true], [5, 6, 4, false]], "g1");
+    const boardOne = createDocumentBoard(createRealPlayer(nameOne), [[2, 5, 3, true], [5, 6, 4, false]], "g1");
 
     const boardTwo = createDocumentBoard(createRealPlayer(nameTwo), [[1, 1, 3, false], [5, 6, 4, true]], "g2");
     boardTwo.classList.toggle("disableGameBoard");
 
     const boards = [boardOne, boardTwo]
 
+    
     boards.forEach(board => {
         board.addEventListener('click', () =>{
-            boards[0].classList.toggle("disableGameBoard")
-            boards[1].classList.toggle("disableGameBoard")
+            if (!playerFlag){
+                boards[0].classList.toggle("disableGameBoard")
+                boards[1].classList.toggle("disableGameBoard")
+                const boardOne = document.querySelector(".g1")
+                const boardTwo = document.querySelector(".g2")
+                boardOne.classList.toggle("g1")
+                boardOne.classList.toggle("g2")
+                boardTwo.classList.toggle("g1")
+                boardTwo.classList.toggle("g2")
+            }
         })
     })
 }
