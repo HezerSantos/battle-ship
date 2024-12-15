@@ -33,8 +33,8 @@ const createGridTile = (gameBoard, player, pType) => {
     playerName.textContent = player.name
     playerName.classList.add(pType);
     gameBoardContainer.classList.add("gameBoardContainer");
-
     gameBoardContainer.appendChild(playerName)
+
     const documentBoard = document.createElement("div");
     documentBoard.classList.add("gameBoard");
     const main = document.querySelector("main")
@@ -55,6 +55,7 @@ const gridTileEventListener = (player, entry, documentBoard, pType) => {
     const gridTile = document.createElement("button");
     gridTile.setAttribute("id", `${pType}${entry.join('')}`);
     gridTile.addEventListener('click', () => {
+        console.log(entry);
         const flagMap = player.gameBoard.recieveAttack(entry[1], entry[0]);
         const hitFlag = flagMap.get("hitFlag");
         const sunkFlag = flagMap.get("sunkFlag");
@@ -63,6 +64,7 @@ const gridTileEventListener = (player, entry, documentBoard, pType) => {
     })
     documentBoard.appendChild(gridTile);
 }
+
 
 let playerFlag = false;
 
@@ -158,7 +160,126 @@ const placeShipOnDocument = (player, coordinates, pType) => {
     })
 }
 
+const createShipPlacement = () => {
+    const gameBoard = createEntryBoard()
+    createPlacementGrid(gameBoard)
+}
+
+const createPlacementGrid = (gameBoard) => {
+    const documentBoard = document.createElement("div");
+    documentBoard.classList.add("gameBoard");
+    const main = document.querySelector("main")
+    createShipContainer();
+    gameBoard.forEach(row => {
+        row.reverse()
+        row.forEach(entry => {
+            shipPlacementEventListener(entry, documentBoard);
+        })
+    })
+    main.appendChild(documentBoard);
+
+    
+}
+
+let entryStart = [null, null];
+let globalShip = null;
+
+const shipPlacementEventListener = (entry, documentBoard) => {
+    const gridTile = document.createElement("button");
+    gridTile.setAttribute("id", `g${entry.join('')}`);
+    gridTile.addEventListener('click', () => {
+        let placementFlag = false
+        //console.log(globalShip)
+        const map = mapShip(entry[1], entry[0], globalShip.length, globalShip.isVertical)
+        //console.log(map)
+        let placeTiles = []
+        map.forEach(entry => {
+            try{
+                const tile = document.querySelector(`#g${entry}`);
+                tile.classList.add("selectedTile")
+                placeTiles.push(tile)
+                placementFlag = true
+            } catch {
+                //console.log(placeTiles)
+                placeTiles.forEach(tile => {
+                    //console.log(tile)
+                    tile.classList.remove("selectedTile")
+                })
+                //tile.classList.remove("selectedTile")
+                placementFlag = false
+                console.log("Out of Range")
+            }
+        })
+        placeTiles = [];
+        if (placementFlag){
+            try{
+                const shipContainer = document.querySelector(".shipContainer")
+                shipContainer.removeChild(globalShip.shipBasis)
+            } catch {
+                console.log("Error: No more ships")
+            }
+        }
+        //then call the event listener here second
+    })
+    documentBoard.appendChild(gridTile);
+}
+
+const createShipContainer = () => {
+    const main = document.querySelector("main")
+    const shipContainer = document.createElement("div");
+    shipContainer.classList.add("shipContainer")
+    const shipList = createShips();
+    shipList.forEach(ship => {
+        shipBasisEventListener(ship)
+        shipContainer.appendChild(ship.shipBasis)
+    })
+    main.appendChild(shipContainer);
+}
+
+const createShips = () => {
+    const shipOne = createShipDimension(4, "shipLengthFourVertical", true)
+    const shipTwo = createShipDimension(4, "shipLengthFourHorizontal", false)
+    const shipThree = createShipDimension(3, "shipLengthThreeVertical", true)
+    const shipFour = createShipDimension(3, "shipLengthThreeHorizontal", false)
+    const shipFive = createShipDimension(2, "shipLengthTwoVertical", true)
+    const shipSix = createShipDimension(2, "shipLengthTwoHorizontal", false)
+
+    const shipList = [shipOne, shipTwo, shipThree, shipFour, shipFive, shipSix];
+    return shipList;
+}
+
+
+const createShipDimension = (length, shipStyle, isVertical) => {
+    const shipBasis = document.createElement("button")
+    shipBasis.classList.add("shipBasis")
+    shipBasis.classList.add(shipStyle)
+    for (let i=0; i < length; i++){
+        const tile = document.createElement("div")
+        shipBasis.appendChild(tile)
+    }
+    return {shipBasis, length, isVertical};
+}
+
+const shipBasisEventListener = (ship) => {
+    ship.shipBasis.addEventListener('focus', () => {
+        globalShip = ship
+        ship.shipBasis.classList.add("shipSelected");
+    })
+    ship.shipBasis.addEventListener('blur', () => {
+        ship.shipBasis.classList.remove("shipSelected");
+    })
+
+}
+
+const shipOne = [null, null, 4, true] //vertical ship
+const shipTwo = [null, null, 4, false] //horizontal ship
+const shipThree = [null, null, 2, true] //vertical ship
+const shipFour = [null, null, 2, false] // horizontal ship
+const shipFive = [null, null, 3, true] //vertical ship
+const shipSix = [null, null, 3, false] // horizontal ship
+
 export const startRealPlayerGame = (nameOne, nameTwo) => {
+    /*
     const boardOne = createDocumentBoard(createRealPlayer(nameOne), [[2, 5, 3, true], [5, 6, 4, false]], "g1");
 
     const boardTwo = createDocumentBoard(createRealPlayer(nameTwo), [[1, 1, 3, false], [5, 6, 4, true]], "g2");
@@ -181,5 +302,7 @@ export const startRealPlayerGame = (nameOne, nameTwo) => {
             }
         })
     })
+    */
+    createShipPlacement();
 }
 
