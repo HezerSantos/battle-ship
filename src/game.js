@@ -183,7 +183,7 @@ const createPlacementGrid = (gameBoard) => {
 
 let entryStart = [null, null];
 let globalShip = null;
-
+const placeShips = new Set()
 const shipPlacementEventListener = (entry, documentBoard) => {
     const gridTile = document.createElement("button");
     gridTile.setAttribute("id", `g${entry.join('')}`);
@@ -193,12 +193,18 @@ const shipPlacementEventListener = (entry, documentBoard) => {
         const map = mapShip(entry[1], entry[0], globalShip.length, globalShip.isVertical)
         //console.log(map)
         let placeTiles = []
+        let tempSet = new Set()
         map.forEach(entry => {
             try{
+                if (placeShips.has(entry)){
+                    throw new Error("Overlap Ships")
+                }
                 const tile = document.querySelector(`#g${entry}`);
+                //add no pointer events to selected Tile
                 tile.classList.add("selectedTile")
                 placeTiles.push(tile)
                 placementFlag = true
+                tempSet.add(entry)
             } catch {
                 //console.log(placeTiles)
                 placeTiles.forEach(tile => {
@@ -208,6 +214,7 @@ const shipPlacementEventListener = (entry, documentBoard) => {
                 //tile.classList.remove("selectedTile")
                 placementFlag = false
                 console.log("Out of Range")
+                tempSet = new Set();
             }
         })
         placeTiles = [];
@@ -215,10 +222,14 @@ const shipPlacementEventListener = (entry, documentBoard) => {
             try{
                 const shipContainer = document.querySelector(".shipContainer")
                 shipContainer.removeChild(globalShip.shipBasis)
+                tempSet.forEach(entry => {
+                    placeShips.add(entry)
+                })
             } catch {
                 console.log("Error: No more ships")
             }
         }
+        console.log(placeShips)
         //then call the event listener here second
     })
     documentBoard.appendChild(gridTile);
