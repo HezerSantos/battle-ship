@@ -181,7 +181,6 @@ const createPlacementGrid = (gameBoard) => {
     
 }
 
-let entryStart = [null, null];
 let globalShip = null;
 const placeShips = new Set()
 const shipPlacementEventListener = (entry, documentBoard) => {
@@ -192,31 +191,45 @@ const shipPlacementEventListener = (entry, documentBoard) => {
         //console.log(globalShip)
         const map = mapShip(entry[1], entry[0], globalShip.length, globalShip.isVertical)
         //console.log(map)
+
+        //flag to see if an entry exists in the set
+        let containFlag = true;
+
+        //temp list to remove the styles of the tile that is placed when out of range
         let placeTiles = []
+
+        //set to update the place ships set
         let tempSet = new Set()
         map.forEach(entry => {
-            try{
-                if (placeShips.has(entry)){
-                    throw new Error("Overlap Ships")
-                }
-                const tile = document.querySelector(`#g${entry}`);
-                //add no pointer events to selected Tile
-                tile.classList.add("selectedTile")
-                placeTiles.push(tile)
-                placementFlag = true
-                tempSet.add(entry)
-            } catch {
-                //console.log(placeTiles)
-                placeTiles.forEach(tile => {
-                    //console.log(tile)
-                    tile.classList.remove("selectedTile")
-                })
-                //tile.classList.remove("selectedTile")
-                placementFlag = false
-                console.log("Out of Range")
-                tempSet = new Set();
+            if (placeShips.has(entry)){
+                containFlag = false;
             }
         })
+        if (containFlag){
+            map.forEach(entry => {
+                try{
+                    const tile = document.querySelector(`#g${entry}`);
+                    //add no pointer events to selected Tile
+                    tile.classList.add("selectedTile")
+                    placeTiles.push(tile)
+                    placementFlag = true
+                    tempSet.add(entry)
+                } catch {
+                    //console.log(placeTiles)
+                    placeTiles.forEach(tile => {
+                        //console.log(tile)
+                        tile.classList.remove("selectedTile")
+                    })
+                    //tile.classList.remove("selectedTile")
+                    placementFlag = false
+                    console.log("Out of Range")
+                    tempSet = new Set();
+                }
+            })
+        }
+        //ERROR IS OCCURING BECAUSE PLACEMENT FLAG IS STAYING TRUE BECAUSE
+        //AN ERROR IS NOT THROWN
+        console.log(placementFlag)
         placeTiles = [];
         if (placementFlag){
             try{

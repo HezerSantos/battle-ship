@@ -277,4 +277,5 @@ img{
 
 .selectedTile{
     background-color: rgb(124, 2, 2);
+    pointer-events: none;
 }
