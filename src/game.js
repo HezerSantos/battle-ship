@@ -174,15 +174,26 @@ const createShipPlacement = (playerName) => {
         const interval = setInterval(() => {
             if (totalShipCount[0] == 6) {
                 clearInterval(interval);
-                resolve(placedShipList);
+                const placedShipMap = new Map()
+                const gameBoard = getGameBoard();
                 globalShip = null;
                 placeShips = new Set()
+
                 const main = document.querySelector("main");
                 main.textContent = "";
+
+                placedShipMap.set("shipList", placedShipList);
+                placedShipMap.set("gameBoard", gameBoard)
+                resolve(placedShipMap);
             }
         }, 50);
     
     })
+}
+
+const getGameBoard = () => {
+    const gameBoard = document.querySelector(".gameBoard");
+    return gameBoard
 }
 
 const createPlacementGrid = (gameBoard, placedShipList, totalShipCount, playerName) => {
@@ -370,12 +381,12 @@ const shipSix = [null, null, 3, false] // horizontal ship
 export const startRealPlayerGame = async (nameOne, nameTwo) => {
 
     const boradOneShips = await createShipPlacement(nameOne);
-    console.log(boradOneShips)
+    //console.log(boradOneShips["shipList"])
     const boardTwoShips = await createShipPlacement(nameTwo);
-    console.log(boardTwoShips)
+    //console.log(boardTwoShips["shipList"])
 
-    const boardOne = createDocumentBoard(createRealPlayer(nameOne), boradOneShips, "g1");
-    const boardTwo = createDocumentBoard(createRealPlayer(nameTwo), boardTwoShips, "g2");
+    const boardOne = createDocumentBoard(createRealPlayer(nameOne), boradOneShips.get("shipList"), "g1");
+    const boardTwo = createDocumentBoard(createRealPlayer(nameTwo), boardTwoShips.get("shipList"), "g2");
    
 
     //console.log(boardOne, boardTwo)
