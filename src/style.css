@@ -216,8 +216,8 @@ img{
 }
 
 .shipContainer{
-    height: max-content;
-    width: max-content;
+    height: 45rem;
+    width: 15rem;
     background-color: rgb(173, 182, 230);
     display: flex;
     flex-direction: column;

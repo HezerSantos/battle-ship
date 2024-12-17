@@ -162,102 +162,117 @@ const placeShipOnDocument = (player, coordinates, pType) => {
 
 const createShipPlacement = () => {
     const gameBoard = createEntryBoard()
-    createPlacementGrid(gameBoard)
+    const placedShipList = [];
+    createPlacementGrid(gameBoard, placedShipList)
 }
 
-const createPlacementGrid = (gameBoard) => {
-    const documentBoard = document.createElement("div");
-    const boardContainer = document.createElement("div");
-    boardContainer.classList.add("boardContainer")
-
-    const errorContainer = document.createElement("div");
-    errorContainer.classList.add("errorContainer");
-    documentBoard.classList.add("gameBoard");
-    const main = document.querySelector("main")
+const createPlacementGrid = (gameBoard, placedShipList) => {
+    const documentBoard = createPlacementDocumentBoard();
+    const boardContainer = createBoardContainer();
+    const errorContainer = createErrorContainer();
     createShipContainer();
     gameBoard.forEach(row => {
         row.reverse()
         row.forEach(entry => {
-            shipPlacementEventListener(entry, documentBoard, errorContainer);
+            shipPlacementEventListener(entry, documentBoard, errorContainer, placedShipList);
         })
     })
     boardContainer.append(documentBoard, errorContainer)
-    main.appendChild(boardContainer);
+    const main = document.querySelector("main")
+    main.appendChild(boardContainer); 
+}
 
-    
+const createPlacementDocumentBoard = () => {
+    const documentBoard = document.createElement("div");
+    documentBoard.classList.add("gameBoard");
+    return documentBoard;
+}
+
+const createBoardContainer = () => {
+    const boardContainer = document.createElement("div");
+    boardContainer.classList.add("boardContainer");
+    return boardContainer;
+}
+
+const createErrorContainer = () => {
+    const errorContainer = document.createElement("div");
+    errorContainer.classList.add("errorContainer");
+    return errorContainer;
 }
 
 let globalShip = null;
 const placeShips = new Set()
-const shipPlacementEventListener = (entry, documentBoard, errorContainer) => {
+
+const createPlacementGridTile = (entry) => {
     const gridTile = document.createElement("button");
     gridTile.setAttribute("id", `g${entry.join('')}`);
+    return gridTile;
+}
+
+const checkDuplicates = (map, containFlag) => {
+    map.forEach(entry => {
+        if (placeShips.has(entry)){
+            containFlag = false;
+        }
+    })
+    return containFlag;
+}
+
+const createSelectedTile = (entry) => {
+    const tile = document.querySelector(`#g${entry}`);
+    tile.classList.add("selectedTile");
+    return tile
+}
+const shipPlacementEventListener = (entry, documentBoard, errorContainer, placedShipList) => {
+    const gridTile = createPlacementGridTile(entry);
     gridTile.addEventListener('click', () => {
         let placementFlag = false
-        //console.log(globalShip)
         try{
             errorContainer.textContent = ""
             const map = mapShip(entry[1], entry[0], globalShip.length, globalShip.isVertical)
-        
-        //console.log(map)
+            let containFlag = true; //flag to see if an entry exists in the set
+            let placeTiles = [] //temp list to remove the styles of the tile that is placed when out of range
+            let tempSet = new Set() //set to update the place ships set
 
-        //flag to see if an entry exists in the set
-        let containFlag = true;
-
-        //temp list to remove the styles of the tile that is placed when out of range
-        let placeTiles = []
-
-        //set to update the place ships set
-        let tempSet = new Set()
-        map.forEach(entry => {
-            if (placeShips.has(entry)){
-                containFlag = false;
-            }
-        })
-        if (containFlag){
-            map.forEach(entry => {
-                try{
-                    errorContainer.textContent = '';
-                    const tile = document.querySelector(`#g${entry}`);
-                    //add no pointer events to selected Tile
-                    tile.classList.add("selectedTile")
-                    placeTiles.push(tile)
-                    placementFlag = true
-                    tempSet.add(entry)
-                } catch {
-                    //console.log(placeTiles)
-                    placeTiles.forEach(tile => {
-                        //console.log(tile)
-                        tile.classList.remove("selectedTile")
-                    })
-                    //tile.classList.remove("selectedTile")
-                    placementFlag = false
-                    console.log("Out of Range")
-                    tempSet = new Set();
-                }
-            })
-        }
-
-        if (!placementFlag){
-            errorContainer.textContent = "Error: Ships cannot Overlap/Escape the field";
-        }
-        //ERROR IS OCCURING BECAUSE PLACEMENT FLAG IS STAYING TRUE BECAUSE
-        //AN ERROR IS NOT THROWN
-        console.log(placementFlag)
-        placeTiles = [];
-        if (placementFlag){
-            try{
-                const shipContainer = document.querySelector(".shipContainer")
-                shipContainer.removeChild(globalShip.shipBasis)
-                tempSet.forEach(entry => {
-                    placeShips.add(entry)
+            containFlag = checkDuplicates(map, containFlag);
+            
+            if (containFlag){
+                map.forEach(entry => {
+                    try{
+                        errorContainer.textContent = '';
+                        const tile = createSelectedTile(entry);
+                        placeTiles.push(tile)
+                        placementFlag = true
+                        tempSet.add(entry)
+                    } catch {
+                        placeTiles.forEach(tile => {
+                            tile.classList.remove("selectedTile")
+                        })
+                        placementFlag = false
+                        console.log("Out of Range")
+                        tempSet = new Set();
+                    }
                 })
-            } catch {
-                console.log("Error: No more ships")
             }
-        }
-        console.log(placeShips)
-        //then call the event listener here second
+
+            if (!placementFlag){
+                errorContainer.textContent = "Error: Ships cannot Overlap/Escape the field";
+            }
+            placeTiles = []; //reset placement tiles
+            if (placementFlag){
+                try{
+                    const shipContainer = document.querySelector(".shipContainer")
+                    shipContainer.removeChild(globalShip.shipBasis)
+                    tempSet.forEach(entry => {
+                        placeShips.add(entry)
+                    })
+                    //Code to add to ship list
+                    placedShipList.push([entry[1], entry[0], globalShip.length, globalShip.isVertical]);
+                    console.log(placedShipList);
+                } catch {
+                    console.log("Error: No more ships")
+                }
+            }
         } catch {
             errorContainer.textContent = "Please Select A Ship First"
         }
@@ -314,12 +329,16 @@ const shipBasisEventListener = (ship) => {
 
 }
 
+
+/*
 const shipOne = [null, null, 4, true] //vertical ship
 const shipTwo = [null, null, 4, false] //horizontal ship
 const shipThree = [null, null, 2, true] //vertical ship
 const shipFour = [null, null, 2, false] // horizontal ship
 const shipFive = [null, null, 3, true] //vertical ship
 const shipSix = [null, null, 3, false] // horizontal ship
+*/
+
 
 export const startRealPlayerGame = (nameOne, nameTwo) => {
     /*
