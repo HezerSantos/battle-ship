@@ -285,9 +285,19 @@ img{
     flex-direction: column;
 }
 
-.errorContainer{
+.errorContainer, .nameContainer{
+    width: 100%;
+    height: 5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.errorContainer{
+    color: red;
+    font-size: 1.2rem;
+}
+
+.nameContainer{
     color: rgb(224, 168, 48);
 }

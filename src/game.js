@@ -1,6 +1,7 @@
 import { createComputerPlayer, createRealPlayer } from "./technical";
 
 export const createDocumentBoard = (player, coordinates, pType) => {
+
     const gameBoard = createEntryBoard();
 
     const documentBoard = createGridTile(gameBoard, player, pType);
@@ -146,6 +147,7 @@ const placeShipOnDocument = (player, coordinates, pType) => {
         
         const map = mapShip(startX, startY, length, isVertical);
 
+        /*
         map.forEach(entry => {
             try{
                 const tile = document.querySelector(`#${pType}${entry}`);
@@ -154,30 +156,48 @@ const placeShipOnDocument = (player, coordinates, pType) => {
                 console.log("Index Out Of Range")
             }
 
-        })
+        })*/
         
         
     })
 }
 
-const createShipPlacement = () => {
-    const gameBoard = createEntryBoard()
-    const placedShipList = [];
-    createPlacementGrid(gameBoard, placedShipList)
+let globalShip = null;
+let placeShips = new Set()
+
+const createShipPlacement = (playerName) => {
+    return new Promise((resolve) => {
+        let totalShipCount = [0]
+        const gameBoard = createEntryBoard()
+        const placedShipList = [];
+        createPlacementGrid(gameBoard, placedShipList, totalShipCount, playerName)
+        const interval = setInterval(() => {
+            if (totalShipCount[0] == 6) {
+                clearInterval(interval);
+                resolve(placedShipList);
+                globalShip = null;
+                placeShips = new Set()
+                const main = document.querySelector("main");
+                main.textContent = "";
+            }
+        }, 50);
+    
+    })
 }
 
-const createPlacementGrid = (gameBoard, placedShipList) => {
+const createPlacementGrid = (gameBoard, placedShipList, totalShipCount, playerName) => {
     const documentBoard = createPlacementDocumentBoard();
     const boardContainer = createBoardContainer();
     const errorContainer = createErrorContainer();
+    const nameContainer = createNameContainer(playerName);
     createShipContainer();
     gameBoard.forEach(row => {
         row.reverse()
         row.forEach(entry => {
-            shipPlacementEventListener(entry, documentBoard, errorContainer, placedShipList);
+            shipPlacementEventListener(entry, documentBoard, errorContainer, placedShipList, totalShipCount);
         })
     })
-    boardContainer.append(documentBoard, errorContainer)
+    boardContainer.append(nameContainer, documentBoard, errorContainer)
     const main = document.querySelector("main")
     main.appendChild(boardContainer); 
 }
@@ -200,8 +220,13 @@ const createErrorContainer = () => {
     return errorContainer;
 }
 
-let globalShip = null;
-const placeShips = new Set()
+const createNameContainer = (playerName) => {
+    const nameContainer = document.createElement("div");
+    nameContainer.classList.add("nameContainer")
+    nameContainer.textContent = `Place Your Ships ${playerName}`;
+    return nameContainer
+}
+
 
 const createPlacementGridTile = (entry) => {
     const gridTile = document.createElement("button");
@@ -223,7 +248,7 @@ const createSelectedTile = (entry) => {
     tile.classList.add("selectedTile");
     return tile
 }
-const shipPlacementEventListener = (entry, documentBoard, errorContainer, placedShipList) => {
+const shipPlacementEventListener = (entry, documentBoard, errorContainer, placedShipList, totalShipCount) => {
     const gridTile = createPlacementGridTile(entry);
     gridTile.addEventListener('click', () => {
         let placementFlag = false
@@ -268,7 +293,9 @@ const shipPlacementEventListener = (entry, documentBoard, errorContainer, placed
                     })
                     //Code to add to ship list
                     placedShipList.push([entry[1], entry[0], globalShip.length, globalShip.isVertical]);
-                    console.log(placedShipList);
+                    totalShipCount[0]++;
+                    //console.log(totalShipCount[0])
+                    //console.log(placedShipList);
                 } catch {
                     console.log("Error: No more ships")
                 }
@@ -340,16 +367,22 @@ const shipSix = [null, null, 3, false] // horizontal ship
 */
 
 
-export const startRealPlayerGame = (nameOne, nameTwo) => {
-    /*
-    const boardOne = createDocumentBoard(createRealPlayer(nameOne), [[2, 5, 3, true], [5, 6, 4, false]], "g1");
+export const startRealPlayerGame = async (nameOne, nameTwo) => {
 
-    const boardTwo = createDocumentBoard(createRealPlayer(nameTwo), [[1, 1, 3, false], [5, 6, 4, true]], "g2");
+    const boradOneShips = await createShipPlacement(nameOne);
+    console.log(boradOneShips)
+    const boardTwoShips = await createShipPlacement(nameTwo);
+    console.log(boardTwoShips)
+
+    const boardOne = createDocumentBoard(createRealPlayer(nameOne), boradOneShips, "g1");
+    const boardTwo = createDocumentBoard(createRealPlayer(nameTwo), boardTwoShips, "g2");
+   
+
+    //console.log(boardOne, boardTwo)
     boardTwo.classList.toggle("disableGameBoard");
 
     const boards = [boardOne, boardTwo]
 
-    
     boards.forEach(board => {
         board.addEventListener('click', () =>{
             if (!playerFlag){
@@ -364,7 +397,6 @@ export const startRealPlayerGame = (nameOne, nameTwo) => {
             }
         })
     })
-    */
-    createShipPlacement();
+
 }
 
