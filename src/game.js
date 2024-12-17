@@ -167,29 +167,38 @@ const createShipPlacement = () => {
 
 const createPlacementGrid = (gameBoard) => {
     const documentBoard = document.createElement("div");
+    const boardContainer = document.createElement("div");
+    boardContainer.classList.add("boardContainer")
+
+    const errorContainer = document.createElement("div");
+    errorContainer.classList.add("errorContainer");
     documentBoard.classList.add("gameBoard");
     const main = document.querySelector("main")
     createShipContainer();
     gameBoard.forEach(row => {
         row.reverse()
         row.forEach(entry => {
-            shipPlacementEventListener(entry, documentBoard);
+            shipPlacementEventListener(entry, documentBoard, errorContainer);
         })
     })
-    main.appendChild(documentBoard);
+    boardContainer.append(documentBoard, errorContainer)
+    main.appendChild(boardContainer);
 
     
 }
 
 let globalShip = null;
 const placeShips = new Set()
-const shipPlacementEventListener = (entry, documentBoard) => {
+const shipPlacementEventListener = (entry, documentBoard, errorContainer) => {
     const gridTile = document.createElement("button");
     gridTile.setAttribute("id", `g${entry.join('')}`);
     gridTile.addEventListener('click', () => {
         let placementFlag = false
         //console.log(globalShip)
-        const map = mapShip(entry[1], entry[0], globalShip.length, globalShip.isVertical)
+        try{
+            errorContainer.textContent = ""
+            const map = mapShip(entry[1], entry[0], globalShip.length, globalShip.isVertical)
+        
         //console.log(map)
 
         //flag to see if an entry exists in the set
@@ -208,6 +217,7 @@ const shipPlacementEventListener = (entry, documentBoard) => {
         if (containFlag){
             map.forEach(entry => {
                 try{
+                    errorContainer.textContent = '';
                     const tile = document.querySelector(`#g${entry}`);
                     //add no pointer events to selected Tile
                     tile.classList.add("selectedTile")
@@ -227,6 +237,10 @@ const shipPlacementEventListener = (entry, documentBoard) => {
                 }
             })
         }
+
+        if (!placementFlag){
+            errorContainer.textContent = "Error: Ships cannot Overlap/Escape the field";
+        }
         //ERROR IS OCCURING BECAUSE PLACEMENT FLAG IS STAYING TRUE BECAUSE
         //AN ERROR IS NOT THROWN
         console.log(placementFlag)
@@ -244,7 +258,12 @@ const shipPlacementEventListener = (entry, documentBoard) => {
         }
         console.log(placeShips)
         //then call the event listener here second
+        } catch {
+            errorContainer.textContent = "Please Select A Ship First"
+        }
+        globalShip = null
     })
+    
     documentBoard.appendChild(gridTile);
 }
 
